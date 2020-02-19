@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <QDesktopServices>
+#include <QProcess>
 #include <QUrl>
 
 SteamInputContext::SteamInputContext()
@@ -39,7 +40,10 @@ void SteamInputContext::showInputPanel()
     qDebug() << "Show input panel";
 
     // Ask steam to open the keyboard
-    QDesktopServices::openUrl(QUrl(QStringLiteral("steam://open/keyboard")));
+    // This does a "proper" run, including bouncy startup cursor
+    //QDesktopServices::openUrl(QUrl(QStringLiteral("steam://open/keyboard")));
+    // which we don't really want in this case, run it directly instead
+    QProcess::startDetached(QStringLiteral("steam"), {QStringLiteral("steam://open/keyboard")});
 
     // Ideally we then told it the keyboard became visible now
 }
