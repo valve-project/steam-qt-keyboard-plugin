@@ -1,5 +1,5 @@
 pkgname=steam-qt-keyboard-plugin
-pkgver=0.1
+pkgver=r5.09d8a25
 pkgrel=1
 pkgdesc="Steam Qt Keyboard Plug-in"
 arch=(x86_64 i686 arm armv6h armv7h aarch64)
