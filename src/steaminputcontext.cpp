@@ -21,11 +21,21 @@
 #include <QDesktopServices>
 #include <QProcess>
 #include <QUrl>
+#include <QFileInfo>
 
 SteamInputContext::SteamInputContext()
     : QPlatformInputContext()
 {
     qDebug() << "Created a SteamInputContext!";
+
+    auto steamRuntime = qEnvironmentVariable("STEAM_RUNTIME");
+    if (!steamRuntime.isEmpty()) {
+        auto dirName = QFileInfo(steamRuntime).absolutePath();
+        dirName.append(QStringLiteral("/steam"));
+        m_steamExecutable = dirName;
+    } else {
+        m_steamExecutable = QStringLiteral("steam");
+    }
 }
 
 SteamInputContext::~SteamInputContext() = default;
@@ -43,7 +53,7 @@ void SteamInputContext::showInputPanel()
     // This does a "proper" run, including bouncy startup cursor
     //QDesktopServices::openUrl(QUrl(QStringLiteral("steam://open/keyboard")));
     // which we don't really want in this case, run it directly instead
-    QProcess::startDetached(QStringLiteral("steam"), {QStringLiteral("steam://open/keyboard")});
+    QProcess::startDetached(m_steamExecutable, {QStringLiteral("-ifrunning"), QStringLiteral("steam://open/keyboard")});
 
     // Ideally we then told it the keyboard became visible now
 }
