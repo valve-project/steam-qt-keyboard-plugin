@@ -35,5 +35,5 @@ public:
 
 private:
     bool m_visible = false;
-
+    QString m_steamExecutable;
 };
