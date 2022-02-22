@@ -19,6 +19,13 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     Gui
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTK3 gtk+-3.0 IMPORTED_TARGET)
+
 add_subdirectory(src)
+
+if (TARGET PkgConfig::GTK3)
+    add_subdirectory(gtk)
+endif()
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
