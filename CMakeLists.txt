@@ -18,11 +18,11 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     Core
     Gui
 )
+    add_subdirectory(qt)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 gtk+-3.0 IMPORTED_TARGET)
 
-add_subdirectory(src)
 
 if (TARGET PkgConfig::GTK3)
     add_subdirectory(gtk)
