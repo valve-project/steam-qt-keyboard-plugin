@@ -2,23 +2,19 @@ cmake_minimum_required(VERSION 3.0)
 
 project(steam-qt-keyboard-plugin)
 
-set(QT_MIN_VERSION "5.11.0")
-set(KF5_MIN_VERSION "5.58.0")
-
-find_package(ECM ${KF5_MIN_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
-set(QML_IMPORT_PATH "${QML_DIRS}" CACHE STRING "Qt Creator 4.1 extra qml import paths")
 
 option(ENABLE_QT "Build the Qt input module" ON)
 option(ENABLE_GTK "Build the GTK input module" ON)
 
-include(KDEInstallDirs)
-include(KDECMakeSettings)
-include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
+include(GNUInstallDirs)
 include(FeatureSummary)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
 if (ENABLE_QT)
-    find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Core Gui)
+    find_package(Qt5 5.15 CONFIG REQUIRED COMPONENTS Core Gui)
     add_subdirectory(qt)
 endif()
 
