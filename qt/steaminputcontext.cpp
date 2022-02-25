@@ -23,18 +23,26 @@
 #include <QUrl>
 #include <QFileInfo>
 
+#include <QDBusConnection>
+#include <QDBusConnectionInterface>
+
+static const auto dbusServiceName = QStringLiteral("org.freedesktop.portal.Steam");
+static const auto dbusObjectName = QStringLiteral("/com/valvesoftware/Steam/Portal1");
+static const auto dbusInterfaceName = QStringLiteral("com.valvesoftware.Steam.Portal1");
+
 SteamInputContext::SteamInputContext()
     : QPlatformInputContext()
 {
-    qDebug() << "Created a SteamInputContext!";
+    m_steamWatcher = std::make_unique<QDBusServiceWatcher>(
+        dbusServiceName,
+        QDBusConnection::sessionBus(),
+        QDBusServiceWatcher::WatchForOwnerChange
+    );
+    connect(m_steamWatcher.get(), &QDBusServiceWatcher::serviceRegistered, this, &SteamInputContext::onServiceRegistered);
+    connect(m_steamWatcher.get(), &QDBusServiceWatcher::serviceUnregistered, this, &SteamInputContext::onServiceUnregistered);
 
-    auto steamRuntime = qEnvironmentVariable("STEAM_RUNTIME");
-    if (!steamRuntime.isEmpty()) {
-        auto dirName = QFileInfo(steamRuntime).absolutePath();
-        dirName.append(QStringLiteral("/steam"));
-        m_steamExecutable = dirName;
-    } else {
-        m_steamExecutable = QStringLiteral("steam");
+    if (QDBusConnection::sessionBus().interface()->isServiceRegistered(dbusServiceName)) {
+        onServiceRegistered();
     }
 }
 
@@ -47,26 +55,44 @@ bool SteamInputContext::isValid() const
 
 void SteamInputContext::showInputPanel()
 {
-    qDebug() << "Show input panel";
-
-    // Ask steam to open the keyboard
-    // This does a "proper" run, including bouncy startup cursor
-    //QDesktopServices::openUrl(QUrl(QStringLiteral("steam://open/keyboard")));
-    // which we don't really want in this case, run it directly instead
-    QProcess::startDetached(m_steamExecutable, {QStringLiteral("-ifrunning"), QStringLiteral("steam://open/keyboard")});
-
-    // Ideally we then told it the keyboard became visible now
+    if (m_steamInterface) {
+        m_steamInterface->asyncCall(QStringLiteral("OpenKeyboard"));
+    }
 }
 
 void SteamInputContext::hideInputPanel()
 {
-    qDebug() << "Hide input panel";
-
-    // Ideally this closed the keyboard again
+    // TODO: Support hiding?
+//     if (m_steamInterface) {
+//         m_steamInterface->asyncCall(QStringLiteral("CloseKeyboard"));
+//     }
 }
 
 bool SteamInputContext::isInputPanelVisible() const
 {
-    // Ideally this returned whether the Steam keyboard is actually shown right now
-    return false;
+    if (!m_steamInterface) {
+        return false;
+    } else {
+        return m_visible;
+    }
+}
+
+void SteamInputContext::onServiceRegistered()
+{
+    //TODO: Use generated interface class
+    m_steamInterface = std::make_unique<QDBusInterface>(
+        dbusServiceName,
+        dbusObjectName,
+        dbusInterfaceName,
+        QDBusConnection::sessionBus()
+    );
+
+    //TODO: It would probably be good to have this so we can satisfy the full
+    //      InputContext API.
+    //connect(m_steamInterface.get(), &SteamInterface::keyboardVisibleChanged, this, onKeyboardVisibleChanged);
+}
+
+void SteamInputContext::onServiceUnregistered()
+{
+    m_steamInterface.reset();
 }

@@ -6,6 +6,7 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_S
 
 option(ENABLE_QT "Build the Qt input module" ON)
 option(ENABLE_GTK "Build the GTK input module" ON)
+option(FLATPAK_BULD "Build for Flatpak" OFF)
 
 include(GNUInstallDirs)
 include(FeatureSummary)
@@ -14,7 +15,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if (ENABLE_QT)
-    find_package(Qt5 5.15 CONFIG REQUIRED COMPONENTS Core Gui)
+    find_package(Qt5 5.15 CONFIG REQUIRED COMPONENTS Core Gui DBus)
     add_subdirectory(qt)
 endif()
 

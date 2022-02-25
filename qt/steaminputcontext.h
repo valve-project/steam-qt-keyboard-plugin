@@ -17,7 +17,12 @@
 
 #pragma once
 
+#include <memory>
+
 #include <qpa/qplatforminputcontext.h>
+
+#include <QDBusServiceWatcher>
+#include <QDBusInterface>
 
 class SteamInputContext : public QPlatformInputContext
 {
@@ -34,6 +39,10 @@ public:
     bool isInputPanelVisible() const override;
 
 private:
+    void onServiceRegistered();
+    void onServiceUnregistered();
+
     bool m_visible = false;
-    QString m_steamExecutable;
+    std::unique_ptr<QDBusServiceWatcher> m_steamWatcher;
+    std::unique_ptr<QDBusInterface> m_steamInterface;
 };
