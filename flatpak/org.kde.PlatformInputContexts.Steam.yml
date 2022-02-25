@@ -1,0 +1,31 @@
+id: org.kde.PlatformInputContexts.Steam
+branch: "1.0"
+
+runtime: org.kde.Platform
+runtime-version: "5.15-21.08"
+sdk: org.kde.Sdk
+
+separate-locales: false
+appstream-compose: false
+
+build-extension: true
+
+modules:
+-   name: inputcontext
+    buildsystem: cmake-ninja
+    config-opts:
+    -   "-DENABLE_GTK=OFF"
+    -   "-DENABLE_QT=ON"
+    sources:
+    -   type: git
+        path: ".."
+        branch: work/ahiemstra/flatpak
+-   name: appdata
+    buildsystem: simple
+    build-commands:
+    -   mkdir -p ${FLATPAK_DEST}/share/appdata
+    -   cp org.kde.PlatformInputContexts.Steam.appdata.xml ${FLATPAK_DEST}/share/appdata
+    -   appstream-compose --basename=org.kde.PlatformInputContexts.Steam --prefix=${FLATPAK_DEST} --origin=flatpak org.kde.PlatformInputContexts.Steam
+    sources:
+    -   type: file
+        path: org.kde.PlatformInputContexts.Steam.appdata.xml

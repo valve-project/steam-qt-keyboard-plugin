@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="runtime">
+  <id>org.kde.PlatformInputContexts.Steam</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>Steam input context</name>
+  <summary>Input context to allow showing the Steam virtual keyboard</summary>
+  <description>
+    <p>Input context to allow showing the Steam virtual keyboard.</p>
+  </description>
+  <url type="homepage">https://steampowered.com</url>
+</component>
