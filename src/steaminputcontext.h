@@ -33,7 +33,10 @@ public:
     void hideInputPanel() override;
     bool isInputPanelVisible() const override;
 
+    Q_SLOT void onEnabledChanged(bool enabled);
+
 private:
     bool m_visible = false;
+    bool m_enabled = true;
     QString m_steamExecutable;
 };

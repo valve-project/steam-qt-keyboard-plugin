@@ -22,6 +22,10 @@
 #include <QProcess>
 #include <QUrl>
 #include <QFileInfo>
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QDBusPendingCallWatcher>
+#include <QDBusPendingReply>
 
 SteamInputContext::SteamInputContext()
     : QPlatformInputContext()
@@ -36,6 +40,32 @@ SteamInputContext::SteamInputContext()
     } else {
         m_steamExecutable = QStringLiteral("steam");
     }
+
+    QDBusConnection::sessionBus().connect(
+        QStringLiteral("org.kde.kded5"),
+        QStringLiteral("/modules/steamkeyboard"),
+        QStringLiteral("com.valvesoftware.keyboard"),
+        QStringLiteral("enabledChanged"),
+        this,
+        SLOT(onEnabledChanged(bool))
+    );
+
+    auto message = QDBusMessage::createMethodCall(
+        QStringLiteral("org.kde.kded5"),
+        QStringLiteral("/modules/steamkeyboard"),
+        QStringLiteral("com.valvesoftware.keyboard"),
+        QStringLiteral("isEnabled")
+    );
+    auto call = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(message), this);
+    connect(call, &QDBusPendingCallWatcher::finished, this, [this, call]() {
+        QDBusPendingReply<bool> reply = *call;
+        if (reply.isError()) {
+            qDebug() << reply.error().message();
+        } else {
+            onEnabledChanged(reply.value());
+        }
+        call->deleteLater();
+    });
 }
 
 SteamInputContext::~SteamInputContext() = default;
@@ -47,6 +77,10 @@ bool SteamInputContext::isValid() const
 
 void SteamInputContext::showInputPanel()
 {
+    if (!m_enabled) {
+        return;
+    }
+
     qDebug() << "Show input panel";
 
     // Ask steam to open the keyboard
@@ -69,4 +103,13 @@ bool SteamInputContext::isInputPanelVisible() const
 {
     // Ideally this returned whether the Steam keyboard is actually shown right now
     return false;
+}
+
+void SteamInputContext::onEnabledChanged(bool enabled)
+{
+    m_enabled = enabled;
+
+    if (!m_enabled) {
+        hideInputPanel();
+    }
 }
