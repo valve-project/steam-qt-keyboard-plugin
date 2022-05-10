@@ -32,6 +32,8 @@ typedef struct _SteamIMContextClass SteamIMContextClass;
 struct _SteamIMContext {
     GtkIMContext parent;
     gchar* steamExecutable;
+    GDBusProxy *keyboardService;
+    gboolean enabled;
 };
 
 struct _SteamIMContextClass {

@@ -36,6 +36,8 @@ static void steam_im_context_init(SteamIMContext *steam_im_context, GTypeClass *
 
 static void steam_im_context_focus_in(GtkIMContext *context);
 
+static void steam_im_context_enabled_changed(GDBusProxy *proxy, const gchar *sender_name, const gchar *signal_name, GVariant *parameters, gpointer data);
+
 GType steam_im_context_get_type()
 {
     return _steam_im_context_type;
@@ -78,6 +80,11 @@ static void steam_im_context_dispose(GObject *object)
 {
     SteamIMContext *im_context = STEAM_IM_CONTEXT(object);
     g_free(im_context->steamExecutable);
+
+    if (im_context->keyboardService) {
+        g_object_unref(im_context->keyboardService);
+    }
+
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
 
@@ -104,6 +111,8 @@ static void steam_im_context_init(SteamIMContext *self, GTypeClass *g_class)
 {
     (void)g_class;
 
+    self->enabled = gtk_true();
+
     const gchar* steamRuntime = g_environ_getenv(NULL, "STEAM_RUNTIME");
     if (steamRuntime) {
         gchar* dirName = g_path_get_dirname(steamRuntime);
@@ -112,12 +121,46 @@ static void steam_im_context_init(SteamIMContext *self, GTypeClass *g_class)
     } else {
         self->steamExecutable = g_strdup("steam");
     }
+
+    GError *error = NULL;
+    self->keyboardService = g_dbus_proxy_new_for_bus_sync(
+        G_BUS_TYPE_SESSION,
+        G_DBUS_PROXY_FLAGS_NONE,
+        NULL,
+        "org.kde.kded5",
+        "/modules/steamkeyboard",
+        "com.valvesoftware.keyboard",
+        NULL,
+        &error
+    );
+    if (self->keyboardService == NULL)
+    {
+      g_printerr("Error getting DBus service: %s", error->message);
+      g_error_free(error);
+      return;
+    }
+
+    g_signal_connect(self->keyboardService, "g-signal", G_CALLBACK(steam_im_context_enabled_changed), self);
+
+    GVariant *result = g_dbus_proxy_call_sync(self->keyboardService, "isEnabled", NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
+    if (result == NULL) {
+        g_printerr("Error calling DBus method: %s", error->message);
+        g_error_free(error);
+        return;
+    }
+
+    steam_im_context_enabled_changed(self->keyboardService, "", "enabledChanged", result, self);
+    g_variant_unref(result);
 }
 
 static void steam_im_context_focus_in(GtkIMContext *context)
 {
     SteamIMContext *im_context = STEAM_IM_CONTEXT(context);
     GError *error = NULL;
+
+    if (im_context->enabled == gtk_false()) {
+        return;
+    }
 
     gchar* argv[4];
     argv[0] = im_context->steamExecutable;
@@ -128,4 +171,20 @@ static void steam_im_context_focus_in(GtkIMContext *context)
     if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &error)) {
         g_warning("Error opening Steam keyboard: %s", error->message);
     }
+}
+
+static void steam_im_context_enabled_changed(GDBusProxy* proxy, const gchar* sender_name, const gchar* signal_name, GVariant* parameters, gpointer data)
+{
+    (void)proxy;
+    (void)sender_name;
+
+    if (strcmp(signal_name, "enabledChanged") != 0) {
+        return;
+    }
+
+    if (g_variant_n_children(parameters) != 1) {
+        return;
+    }
+
+    STEAM_IM_CONTEXT(data)->enabled = g_variant_get_boolean(g_variant_get_child_value(parameters, 0));
 }
