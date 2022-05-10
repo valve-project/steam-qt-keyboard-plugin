@@ -1,0 +1,10 @@
+{
+    "KPlugin": {
+        "Description": "Control whether the steam virtual keyboard is automatically shown or not.",
+        "Icon": "input-keyboard-virtual",
+        "Name": "Steam Virtual Keyboard"
+    },
+    "X-KDE-Kded-autoload": true,
+    "X-KDE-Kded-load-on-demand": false,
+    "X-KDE-Kded-phase": 2
+}
