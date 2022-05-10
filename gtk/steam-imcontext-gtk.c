@@ -186,5 +186,15 @@ static void steam_im_context_enabled_changed(GDBusProxy* proxy, const gchar* sen
         return;
     }
 
-    STEAM_IM_CONTEXT(data)->enabled = g_variant_get_boolean(g_variant_get_child_value(parameters, 0));
+    SteamIMContext *context = STEAM_IM_CONTEXT(data);
+    context->enabled = g_variant_get_boolean(g_variant_get_child_value(parameters, 0));
+
+    if (context->enabled == gtk_false()) {
+        gchar* argv[4];
+        argv[0] = context->steamExecutable;
+        argv[1] = (gchar*)"-if-running";
+        argv[2] = (gchar*)"steam://close/keyboard";
+        argv[3] = NULL;
+        g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL);
+    }
 }

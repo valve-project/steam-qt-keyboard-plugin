@@ -110,6 +110,9 @@ void SteamInputContext::onEnabledChanged(bool enabled)
     m_enabled = enabled;
 
     if (!m_enabled) {
-        hideInputPanel();
+        // This should ideally just call hideInputPanel() but putting this into
+        // hideInputPanel causes issues due to focus loops, so instead only
+        // explicitly close when we know the keyboard should be disabled.
+        QProcess::startDetached(m_steamExecutable, {QStringLiteral("-ifrunning"), QStringLiteral("steam://close/keyboard")});
     }
 }
