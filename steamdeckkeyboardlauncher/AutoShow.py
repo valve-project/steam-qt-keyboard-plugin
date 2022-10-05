@@ -24,11 +24,13 @@ from __future__ import division, print_function, unicode_literals
 
 import AtspiStateTracker
 from Timer import TimerOnce
+from Config import Config
 
 ### Logging ###
 import logging
 _logger = logging.getLogger("AutoShow")
 
+import os
 import subprocess
 ###############
 
@@ -48,12 +50,21 @@ class AutoShow(object):
     _paused = False
     _state_tracker = AtspiStateTracker.AtspiStateTracker()
     _autoshow_enabled = True
+    _config = Config()
+    _steampath = "/home/deck/.local/share/Steam/ubuntu12_32/steam"
 
     def __init__(self):
         self._auto_show_timer = TimerOnce()
         self._pause_timer = TimerOnce()
         self._thaw_timer = TimerOnce()
         self._active_accessible = None
+        self.enable(self._config.autoshow_enabled())
+        self._config.connect("config-changed",
+                             self._on_config_changed)
+
+        # add a safe fallback
+        if not os.path.isfile(_steampath):
+            _steampath = "steam"
 
     def reset(self):
         self._auto_show_timer.stop()
@@ -67,6 +78,7 @@ class AutoShow(object):
         self.enable(False)  # disconnect atspi events
 
     def enable(self, enable):
+        print("Enabling:", enable)
         if enable:
             self._state_tracker.connect("text-entry-activated",
                                         self._on_text_entry_activated)
@@ -186,6 +198,9 @@ class AutoShow(object):
                not self.is_frozen():
                 self.show_keyboard(active)
 
+    def _on_config_changed(self):
+        self.enable(self._config.autoshow_enabled())
+
     def show_keyboard(self, show):
         """ Begin AUTO_SHOW or AUTO_HIDE transition """
         # Don't act on each and every focus message. Delay the start
@@ -202,6 +217,6 @@ class AutoShow(object):
             final_url = "steam://open/keyboard"
         else :
             final_url = "steam://close/keyboard"
-        subprocess.run(["steam", "-ifrunning", final_url])
+        subprocess.run([self._steampath, "-ifrunning", final_url])
 
 

@@ -3,13 +3,16 @@
 import gi
 from gi.repository import GLib
 
+
+
 import logging
 import AutoShow
+import Config
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
     autoshow = AutoShow.AutoShow()
-    autoshow.enable(True)
+
     loop = GLib.MainLoop()
     loop.run()
 

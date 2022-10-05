@@ -1452,8 +1452,8 @@ class XDGDirs:
     def find_config_files(file):
         """ Find file in all config directories, highest priority first. """
         paths = XDGDirs.get_all_config_dirs(file)
-        return [p for p in paths if os.path.isfile(path) and \
-                                    os.access(filename, os.R_OK)]
+        return [p for p in paths if os.path.isfile(p) and \
+                                    os.access(p, os.R_OK)]
 
     @staticmethod
     def find_config_file(file):
