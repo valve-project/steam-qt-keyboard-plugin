@@ -63,8 +63,8 @@ class AutoShow(object):
                              self._on_config_changed)
 
         # add a safe fallback
-        if not os.path.isfile(_steampath):
-            _steampath = "steam"
+        if not os.path.isfile(self._steampath):
+            self._steampath = "steam"
 
     def reset(self):
         self._auto_show_timer.stop()
