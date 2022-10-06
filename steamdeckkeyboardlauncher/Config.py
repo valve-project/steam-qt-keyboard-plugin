@@ -21,9 +21,9 @@ class Config(EventSource):
             config_location = XDGDirs.find_config_file("kdesteam")
             config = configparser.ConfigParser()
             config.read(config_location)
-            return config["Keyboard"].getboolean("showAutomatically", False)
+            return config["Keyboard"].getboolean("showAutomatically", True)
         except:
-            return False
+            return True
 
     def _handle_settings_changed(self, args):
         read_settings()
