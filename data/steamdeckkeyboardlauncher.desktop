@@ -1,0 +1,5 @@
+Name=Onboard
+Exec=steamdeckkeyboardlauncher
+Type=Application
+NoDisplay=true
+OnlyShowIn=KDE

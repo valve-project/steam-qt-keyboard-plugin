@@ -1,5 +1,5 @@
 import os
-
+import glob
 from setuptools import setup
 
 setup(name="steamdeckkeyboardlauncher",
@@ -10,4 +10,5 @@ setup(name="steamdeckkeyboardlauncher",
       licensen="GPLv3",
       packages=["steamdeckkeyboardlauncher"],
       entry_points={"console_scripts": ["steamdeckkeyboardlauncher = steamdeckkeyboardlauncher:main"]},
+      data_files = [("/etc/xdg/autostart", glob.glob("data/steamdeckkeyboardlauncher.desktop"))]
 )
