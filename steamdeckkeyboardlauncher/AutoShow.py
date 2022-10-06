@@ -21,14 +21,12 @@
 
 from __future__ import division, print_function, unicode_literals
 
-
-import AtspiStateTracker
-from Timer import TimerOnce
-from Config import Config
+from steamdeckkeyboardlauncher.AtspiStateTracker import AtspiStateTracker
+from steamdeckkeyboardlauncher.Timer import TimerOnce
+from steamdeckkeyboardlauncher.Config import Config
 
 ### Logging ###
 import logging
-_logger = logging.getLogger("AutoShow")
 
 import os
 import subprocess
@@ -48,7 +46,7 @@ class AutoShow(object):
     _lock_visible = False
     _frozen = False
     _paused = False
-    _state_tracker = AtspiStateTracker.AtspiStateTracker()
+    _state_tracker = AtspiStateTracker()
     _autoshow_enabled = True
     _config = Config()
     _steampath = "/home/deck/.local/share/Steam/ubuntu12_32/steam"

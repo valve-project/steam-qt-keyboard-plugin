@@ -1,13 +1,10 @@
 #!/bin/env python3
 
-import gi
 from gi.repository import GLib
 
-
-
 import logging
-import AutoShow
-import Config
+from steamdeckkeyboardlauncher import AutoShow
+from steamdeckkeyboardlauncher import Config
 
 def main():
     logging.basicConfig(level=logging.DEBUG)

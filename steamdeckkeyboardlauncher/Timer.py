@@ -24,7 +24,7 @@ import subprocess
 
 from gi.repository import GLib
 
-from utils import Fade
+from steamdeckkeyboardlauncher.utils import Fade
 
 _logger = logging.getLogger("utils_timers.py")
 

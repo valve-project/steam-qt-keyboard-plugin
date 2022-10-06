@@ -1,8 +1,9 @@
 import configparser
-from utils import XDGDirs, EventSource
 import dbus
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
+
+from steamdeckkeyboardlauncher.utils import XDGDirs, EventSource
 
 class Config(EventSource):
     config = configparser.ConfigParser()

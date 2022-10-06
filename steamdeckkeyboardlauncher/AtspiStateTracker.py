@@ -33,7 +33,7 @@ try:
 except ImportError as e:
     _logger.warning("Atspi typelib missing, auto-show unavailable")
 
-from utils        import Rect, EventSource, Process, unicode_str
+from steamdeckkeyboardlauncher.utils import Rect, EventSource, Process, unicode_str
 
 # # Config Singleton
 # from Onboard.Config import Config
