@@ -13,8 +13,11 @@ def sigint_handler(sig, frame):
     if sig == signal.SIGINT:
         loop.quit()
 
-if __name__ == "__main__":
+def main():
     logging.basicConfig(level=logging.DEBUG)
     autoshow = AutoShow.AutoShow()
     signal.signal(signal.SIGINT, sigint_handler)
     loop.run()
+
+if __name__ == "__main__":
+    main()
