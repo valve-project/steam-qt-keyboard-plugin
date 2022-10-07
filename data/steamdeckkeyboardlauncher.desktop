@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Onboard
+Name=Steam keyboard launcher
 Exec=steamdeckkeyboardlauncher
 Type=Application
 NoDisplay=true
