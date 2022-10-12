@@ -1,0 +1,10 @@
+{
+    "KPlugin": {
+        "Icon": "preferences-desktop-locale",
+        "Name": "Steam integration for KDE",
+        "Name[x-test]": "xxSteam integration for KDExx"
+    },
+    "X-DocPath": "kcontrol/kdesteam/index.html",
+    "X-KDE-Weight": 60,
+    "X-KDE-System-Settings-Parent-Category": "appearance"
+}

@@ -1,0 +1,5 @@
+File=kdesteam.kcfg
+NameSpace=KdeSteamSettings
+ClassName=KeyboardSettings
+UseEnumTypes=true
+Mutators=true
