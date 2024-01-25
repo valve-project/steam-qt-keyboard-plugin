@@ -35,6 +35,7 @@ static void steam_im_context_class_init(SteamIMContextClass *klass, gpointer cla
 static void steam_im_context_init(SteamIMContext *steam_im_context, GTypeClass *g_class);
 
 static void steam_im_context_focus_in(GtkIMContext *context);
+static gboolean steam_im_context_filter_keypress(GtkIMContext *, GdkEventKey *);
 
 GType steam_im_context_get_type()
 {
@@ -59,13 +60,7 @@ void steam_im_context_register_type(GTypeModule *type_module)
     if (_steam_im_context_type)
         return;
 
-    if (type_module) {
-        _steam_im_context_type = g_type_module_register_type(type_module, GTK_TYPE_IM_CONTEXT,
-                                        "SteamIMContext", &steam_im_context_info, (GTypeFlags)0);
-    } else {
-        _steam_im_context_type = g_type_register_static(GTK_TYPE_IM_CONTEXT, "SteamIMContext",
-                                                        &steam_im_context_info, (GTypeFlags)0);
-    }
+    _steam_im_context_type = g_type_module_register_type(type_module, GTK_TYPE_IM_CONTEXT, "SteamIMContext", &steam_im_context_info, (GTypeFlags)0);
 }
 
 GtkIMContext *steam_im_context_new(void)
@@ -98,6 +93,7 @@ static void steam_im_context_class_init(SteamIMContextClass *klass, gpointer cla
     gobject_class->finalize = steam_im_context_finalize;
 
     imclass->focus_in = steam_im_context_focus_in;
+    imclass->filter_keypress = steam_im_context_filter_keypress;
 }
 
 static void steam_im_context_init(SteamIMContext *self, GTypeClass *g_class)
@@ -129,3 +125,21 @@ static void steam_im_context_focus_in(GtkIMContext *context)
         g_warning("Error opening Steam keyboard: %s", error->message);
     }
 }
+
+static gboolean steam_im_context_filter_keypress(GtkIMContext *context, GdkEventKey *event)
+{
+    SteamIMContext *im_context = STEAM_IM_CONTEXT(context);
+
+    if (event->type == GDK_KEY_RELEASE) {
+        gunichar ch = gdk_keyval_to_unicode (event->keyval);
+        if (ch != 0 && !g_unichar_iscntrl (ch)) {
+            gchar keyval_utf8[7];
+            gint length = g_unichar_to_utf8(gdk_keyval_to_unicode(event->keyval), keyval_utf8);
+            keyval_utf8[length] = '\0';
+            g_signal_emit_by_name(im_context, "commit", keyval_utf8);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
