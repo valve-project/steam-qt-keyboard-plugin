@@ -5,10 +5,11 @@ pkgdesc="Steam Qt Keyboard Plug-in"
 arch=(x86_64 i686 arm armv6h armv7h aarch64)
 url="https://github.com/valve-project/steam-qt-keyboard-plugin"
 license=(GPL3)
-depends=('qt5-base' 'gtk3')
-makedepends=('git' 'extra-cmake-modules')
+makedepends=('git' 'extra-cmake-modules' 'qt5-base' 'gtk3' 'gtk4')
+optdepends=('qt5-base: For the Qt input plugin'
+            'gtk3: For the Gtk3 input module'
+            'gtk4: For the Gtk4 input module')
 provides=(steam-qt-keyboard-plugin)
-conflicts=(steam-qt-keyboard-plugin)
 source=("git+${url}.git")
 sha256sums=('SKIP')
 
